@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from interval import Interval
+from Calculation.interval import Interval
 
 @dataclass
 class Iteration:

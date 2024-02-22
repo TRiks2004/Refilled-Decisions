@@ -1,7 +1,7 @@
 from typing import List
 
-from interval import Interval
-from iteration import Iteration
+from Calculation.interval import Interval
+from Calculation.iteration import Iteration
 
 
 class Answer: ...

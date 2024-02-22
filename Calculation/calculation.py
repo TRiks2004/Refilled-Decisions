@@ -4,9 +4,9 @@ import copy
 from typing import List
 from types import CodeType
 
-from interval import Interval
-from answer import AnswerSolutionsByIterations
-from iteration import Iteration
+from Calculation.interval import Interval
+from Calculation.answer import AnswerSolutionsByIterations
+from Calculation.iteration import Iteration
 
 class Calculation:
 
@@ -85,3 +85,5 @@ class Calculation:
             answerSolutionsByIterationsList.append(answerSolutionsByIterations)
 
         return answerSolutionsByIterationsList
+
+
