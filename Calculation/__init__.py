@@ -1,4 +1,9 @@
-from .interval import Interval
-from .answer import Answer
+from .equation import Equation
+
 from .calculation import Calculation
-from .iteration import Iteration
+
+from .interval import Interval
+
+from .iteration import IterationBisectionMethod, IterationChordMethod, IterationNewtonMethod
+
+from .answer import AnswerBisectionMethod, AnswerChordMethod, AnswerNewtonMethod

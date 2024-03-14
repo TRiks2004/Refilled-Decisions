@@ -26,7 +26,7 @@ class CardIteration(ft.UserControl):
             chr_amount = f"+"
         
         
-        return f"{interval.interval_start} {chr_amount} {interval_end}"
+        return f"{round(interval.interval_start, 5)} {chr_amount} {round(interval_end, 5)}"
 
 
 
@@ -54,8 +54,14 @@ class CardIteration(ft.UserControl):
                             spacing=1
                         ),
                         ft.Text(
-                            f"= {self.iteration.average}"
+                            f"= {round(self.iteration.average, 5)}"
                         ),
+                        ft.Text(
+                            width=10
+                        ),
+                        ft.Text(
+                            f"f({round(self.iteration.average, 5)})  =  {round(self.iteration.calculation_average, 5)}"
+                        )
                     ],
                     alignment=ft.MainAxisAlignment.START,
                     vertical_alignment=ft.CrossAxisAlignment.CENTER
@@ -66,6 +72,48 @@ class CardIteration(ft.UserControl):
         )
 
 
+class TextFancField(ft.UserControl):
+    
+    def __init__(self,):
+        super().__init__()
+        
+        
+        
+    def build(self):
+        
+        # коффициент a
+        
+        cofifier = lambda name:(  
+            ft.TextField(
+                label=name, width=150, 
+                keyboard_type=ft.KeyboardType.NUMBER, 
+                text_align=ft.TextAlign.CENTER,  
+                input_filter=ft.InputFilter(allow=True, regex_string=r"[-0-9]", replacement_string="")
+            )
+        )
+        
+        self.cofifier_a = cofifier('коэффициент a')
+        self.cofifier_b = cofifier('коэффициент b')
+        self.cofifier_d = cofifier('коэффициент d')
+        self.cofifier_c = cofifier('коэффициент c')
+        
+        
+        blok = ft.Row(
+            controls=[
+                ft.Image(src="f.png"),
+                self.cofifier_a,
+                self.cofifier_b,
+                self.cofifier_d,
+                self.cofifier_c
+            ],
+            alignment=ft.MainAxisAlignment.CENTER
+        )
+        
+        return blok
+    
+    def get_formula(self):
+        return f"({self.cofifier_a.value} * (x ** 3)) + ({self.cofifier_b.value} * (x ** 2)) + ({self.cofifier_d.value} * (x ** 1)) + ({self.cofifier_c.value})"
+
 
 def main(page: ft.Page):
     page.title = "Test"
@@ -74,30 +122,52 @@ def main(page: ft.Page):
     page.theme_mode = ft.ThemeMode.DARK
     
     
-    input_text = ft.TextField(value='math.fabs(x + math.pow(math.e, x)) - 2')
+    input_text = TextFancField()
     
     steps_decision: ft.Column
+    answer: ft.Column
+    
+    text_field_a = ft.TextField(label="a", width=300)
+    text_field_b = ft.TextField(label="b", width=300)
+    text_field_accuracy = ft.TextField(label="точность", width=300)
     
     
     def on_click_calculate(e):
+        print(input_text.get_formula())
         
+        cal = Calculation(
+            input_text.get_formula(), 
+            [
+                Interval(
+                    int(text_field_a.value), 
+                    int(text_field_b.value)
+                )
+            ], 
+            len(text_field_accuracy.value.split('.')[1])
+        )
         
-        cal = Calculation(input_text.value, [Interval(-3, -1)], 5)
-        
-        answer = cal.solutions_by_iterations()
-        
+        answer_solutions = cal.solutions_by_iterations()
         
         card = [
-            CardIteration(i) for i in answer[0].iterations
+            CardIteration(i) for i in answer_solutions[0].iterations
         ]
                 
         steps_decision.controls = card
         
+        answer.controls = [
+            ft.Card(
+                content=ft.Container(
+                    ft.Column(
+                        controls=[
+                            ft.Text(f"Ответ: {answer_solutions[0].root}", size=20)
+                        ]
+                    ),
+                    padding=ft.padding.all(10),
+                )
+            )
+        ]
         
         
-        
-        
-        print(input_text.value)
         function_policy.update()
         page.update()
     
@@ -110,25 +180,18 @@ def main(page: ft.Page):
     
     steps_decision = ft.Column(
         [],
-        scroll=ft.ScrollMode.AUTO,
-        
+        scroll=ft.ScrollMode.AUTO
     )
     
     
     answer = ft.Column(
-            [
-            ft.Text("Step 1"),
-            ft.Text("Step 2"),
-            ft.Text("Step 3"),
-            ft.Text("Step 4"),
-            ft.Text("Step 5"),
-        ],
+        [],
         width=400
     )
     
     
     steps_decision_and_answer = ft.Container(
-        ft.Row(
+        ft.Column(
             controls=[
                 steps_decision,
                 answer
@@ -141,7 +204,16 @@ def main(page: ft.Page):
         ft.Column(
             controls=[
                 input_text,
-                button_calculate,
+                ft.Row(
+                    controls=[
+                        text_field_accuracy,
+                        text_field_a,
+                        text_field_b,
+                        button_calculate,  
+                    ],
+                    alignment=ft.MainAxisAlignment.END,
+                    vertical_alignment=ft.CrossAxisAlignment.CENTER
+                ),
                 steps_decision_and_answer,
                 
             ]
@@ -149,8 +221,11 @@ def main(page: ft.Page):
     )
     
     page.scroll = ft.ScrollMode.AUTO
+    import math
     
+    page.theme_mode = ft.ThemeMode.LIGHT
     
+
     page.update()
     page.add(function_policy)
     
